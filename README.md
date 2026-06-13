@@ -8,7 +8,7 @@ This repository keeps shared framework knowledge separate from agent-specific ex
 
 - `llm-api-adapter`: provider adapter layer for OpenAI, Anthropic, DeepSeek, and OpenAI-compatible endpoints.
 - `llm-harness-core`: core agent framework with messages, tools, execution envs, hooks, events, `Agent`, `AgentHarness`, sessions, compaction, and skills/templates.
-- `llm-harness-runtime`: coding-agent runtime layer with built-in tools, prompt assembly, settings, JSONL sessions, retry, and auto-compaction wiring.
+- `llm-harness-runtime`: runtime v0.2 platform workspace with sandbox, tool registry/source discovery, MCP adapters, resource injection, prompt sources, task lifecycle, sub-agents, tracing, audit, auth, budget, and human approval infrastructure.
 
 ## Repository Layout
 
@@ -46,7 +46,7 @@ The first Codex skill is:
 llm-harness-framework
 ```
 
-Use it when working on provider integration, DeepSeek/OpenAI/Anthropic switching, `Agent`/`AgentHarness`, runtime `CodingAgentBuilder`, tools, hooks, events, sessions, compaction, or tests for the LLM Harness framework family.
+Use it when working on provider integration, DeepSeek/OpenAI/Anthropic switching, `Agent`/`AgentHarness`, runtime platform services, tools, hooks, events, sessions, compaction, sandboxing, MCP, task lifecycle, tracing, audit, budget, auth, approval, or tests for the LLM Harness framework family.
 
 ## Install For Codex
 
@@ -190,4 +190,4 @@ If you installed by copy, copy the updated `codex/skills/llm-harness-framework` 
 
 Start with one Codex skill and route to references through progressive disclosure. Split into multiple skills later only if real use shows that the single skill is too broad or loads too much context.
 
-Avoid calling this an SDK-only pack. The main target is an agent framework: provider adapters, harness loop, tools, hooks, runtime wiring, and product-agent architecture.
+Avoid calling this an SDK-only pack. The main target is an agent framework: provider adapters, harness loop, tools, hooks, runtime platform wiring, and product-agent architecture.

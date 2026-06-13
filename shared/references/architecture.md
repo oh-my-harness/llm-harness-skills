@@ -8,7 +8,7 @@ Use this reference when deciding where a change belongs in the LLM Harness frame
 
 `llm-harness-core` is the agent framework layer. It defines messages, tools, execution environments, hooks, events, the streaming loop, `Agent`, `AgentHarness`, sessions, compaction, and skills/templates.
 
-`llm-harness-runtime` is a higher-level runtime wrapper for coding-agent style products. It provides built-in tools, prompt assembly, settings, context-file loading, JSONL session wiring, retry, and auto-compaction.
+`llm-harness-runtime` is the platform/runtime infrastructure layer above core. In v0.2 it is a workspace of platform traits plus optional implementation crates for sandboxing, auth, MCP, tracing, and audit. It provides orchestration mechanisms such as `Sandbox`, `ToolRegistry`, `ToolSource`, `TaskRunner`, `ResourceProvider`, `PromptSource`, `SubAgentSpawner`, `TraceExporter`, `AuditSink`, `BudgetControlAdapter`, and `HumanApprovalWrapper`.
 
 ## Crate Map
 
@@ -26,12 +26,16 @@ Core:
 - `llm-harness-loop`: low-level streaming agent loop, adapter bridge, retry config, conversion, and tool dispatch.
 - `llm-harness`: public framework facade with `Agent`, `AgentHarness`, session repos, compaction, and skill/template loading.
 
-Runtime:
+Runtime v0.2:
 
-- `CodingAgent` / `CodingAgentBuilder`: coding-agent runtime wrapper.
-- `tools`: read/bash/edit/write/grep/find/ls.
-- `prompt`: system prompt assembly.
-- `settings`: global/project settings merge.
+- `crates/llm-harness-runtime`: platform traits and core orchestration helpers.
+- `llm-harness-runtime-sandbox-os`: development/local `OsEnvSandbox`.
+- `llm-harness-runtime-sandbox-bwrap`: Linux bubblewrap sandbox backend.
+- `llm-harness-runtime-sandbox-seatbelt`: macOS seatbelt sandbox backend.
+- `llm-harness-runtime-auth`: `EnvAuthHook` and `FileAuthHook`.
+- `llm-harness-runtime-mcp`: MCP tool/prompt adapter layer through runtime traits.
+- `llm-harness-runtime-audit-jsonl`: JSONL `AuditSink`.
+- `llm-harness-runtime-trace-otel`: tracing exporters including in-memory and OTLP-style tracing.
 
 ## Choosing The Entry Point
 
@@ -39,7 +43,7 @@ Use `Agent` when the task is a lightweight stateful prototype, test, or script. 
 
 Use `AgentHarness` when the task needs session persistence, compaction, skills/templates, branch/session operations, harness lifecycle events, hooks, or product-facing observability.
 
-Use runtime `CodingAgentBuilder` when the product intentionally resembles a coding agent and wants built-in tools, prompt assembly, context file loading, JSONL sessions, retry, and auto-compaction.
+Use runtime v0.2 when the product needs platform services around core: sandbox lifecycle, tool discovery/registry, MCP integration, resource injection, prompt source compilation, task lifecycle/checkpoints, sub-agent spawning, tracing, audit, budget control, auth, or human approval. Runtime does not replace `AgentHarness`; it composes around it through core hooks and platform traits.
 
 Use `llm-harness-loop` directly only when building a framework/runtime layer or testing loop behavior.
 
@@ -51,4 +55,4 @@ Tool contracts and hook contracts belong to `llm-harness-types`. Product/domain 
 
 Agent loop orchestration belongs to core. Product agents should configure `Agent` or `AgentHarness`, not duplicate loop dispatch.
 
-Runtime conveniences belong to `llm-harness-runtime`. Domain products may skip runtime if they need a different product shape.
+Runtime platform concerns belong to `llm-harness-runtime`. Product agents still own product prompts, provider selection policy, domain tools, task verification policy, and UI/CLI integration.

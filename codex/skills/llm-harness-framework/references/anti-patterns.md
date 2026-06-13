@@ -14,13 +14,19 @@ Do not read provider environment variables at every call site. Centralize config
 
 Do not force native provider paths into generic provider-switching code.
 
+Do not assume `ChatRequest::extended_thinking_budget` controls every provider's reasoning mode. It is currently consumed by Anthropic conversion and ignored elsewhere unless support is added.
+
 ## Core/Runtime Boundary Anti-Patterns
 
 Do not put product prompts, CLI/TUI concerns, auth storage policy, or model registry policy into `llm-harness-core`.
 
 Do not put low-level agent loop logic into runtime or product crates when `Agent` or `AgentHarness` can do it.
 
-Do not make domain agents depend on `CodingAgentBuilder` unless they intentionally want coding-agent behavior.
+Do not treat runtime v0.2 as a replacement for core. Runtime composes around core using `AgentHarness`, platform traits, and hooks.
+
+Do not reintroduce a monolithic `CodingAgentBuilder` abstraction as the only runtime path. Runtime v0.2 is a platform layer; product agents should assemble only the services they need.
+
+Do not duplicate runtime platform traits in product crates when runtime already exposes `Sandbox`, `ToolRegistry`, `ToolSource`, `ResourceProvider`, `PromptSource`, `TaskRunner`, `SubAgentSpawner`, `TraceExporter`, `AuditSink`, `AuthHook`, `BudgetControlAdapter`, or `HumanApprovalWrapper`.
 
 ## Tool Anti-Patterns
 
@@ -39,6 +45,8 @@ Do not make mutating tools parallel when they must serialize.
 Do not implement global approval, budget, audit, or replan policy separately in each tool.
 
 Do not overwrite existing hooks without checking whether composition is needed.
+
+Do not register tracing, budget, audit, and approval hooks by assigning the same `HarnessHooks` slot repeatedly. Use runtime composite hook helpers when multiple adapters need the same lifecycle point.
 
 Do not use `ShouldStopHook` as active cancellation.
 

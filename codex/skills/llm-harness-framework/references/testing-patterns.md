@@ -14,6 +14,8 @@ For DeepSeek, look for existing `deepseek_*` tests and `integration_deepseek.rs`
 
 Use `llm-harness-loop` test utilities when available. With the `test-utils` feature, use mock clients to drive deterministic responses.
 
+Core compaction and harness integration tests that depend on mock clients are gated behind the `test-utils` feature. When adding tests that use `MockLlmClient`, `MockResponse`, or `NoOpEnv`, ensure the crate feature is enabled in the test target or guard the test module appropriately.
+
 Test loop behavior with:
 
 - text responses
@@ -54,9 +56,19 @@ Assert both the hook decision and the final event/session effects.
 
 ## Runtime Tests
 
-For `CodingAgentBuilder`, test builder behavior without network by passing a mock `Arc<dyn LlmClient>`.
+For runtime v0.2, test platform traits and implementation crates separately:
 
-Use temp directories for session storage, context files, settings files, and skill/template dirs.
+- `llm-harness-runtime`: traits, registries, adapters, task state, budget, approval, audit, tracing adapters.
+- `llm-harness-runtime-sandbox-os`: local sandbox and `ExecutionEnv` behavior.
+- `llm-harness-runtime-sandbox-bwrap`: Linux-specific sandbox behavior.
+- `llm-harness-runtime-sandbox-seatbelt`: macOS-specific sandbox behavior.
+- `llm-harness-runtime-auth`: env/file auth hooks.
+- `llm-harness-runtime-audit-jsonl`: JSONL audit sink.
+- `llm-harness-runtime-trace-otel`: in-memory and exporter behavior.
+
+Use temp directories for sandbox work dirs, audit logs, auth files, checkpoints, session storage, and resource/prompt fixtures.
+
+Use in-memory exporters and fake providers for deterministic runtime tests. Do not make runtime unit tests depend on a real MCP server, OTel collector, or provider API unless the test is explicitly an opt-in integration test.
 
 ## Real API Tests
 

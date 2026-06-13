@@ -4,9 +4,9 @@ This inventory summarizes the three framework repositories that the skill pack s
 
 ## Repositories
 
-- `D:\GKXTwork\llm-api-adapter`: provider adapter layer. Normalizes provider wire formats into canonical chat, streaming, tool-call, reasoning, usage, and error types.
-- `D:\GKXTwork\llm-harness-core`: core agent framework. Owns message/tool/env contracts, streaming loop, `Agent`, `AgentHarness`, sessions, compaction, skills, and events.
-- `D:\GKXTwork\llm-harness-runtime`: higher-level runtime wrapper for coding-agent style applications. Owns built-in filesystem/shell tools, prompt assembly, settings, `CodingAgentBuilder`, JSONL sessions, and auto-compaction wiring.
+- `D:\GKXTwork\llm-api-adapter`: provider adapter layer. Normalizes provider wire formats into canonical chat, streaming, tool-call, reasoning, usage, and error types. Inventory checked against `origin/main` commit `c1d2cb8`.
+- `D:\GKXTwork\llm-harness-core`: core agent framework. Owns message/tool/env contracts, streaming loop, `Agent`, `AgentHarness`, sessions, compaction, skills, and events. Inventory checked against `origin/main` commit `9ad7292`.
+- `D:\GKXTwork\llm-harness-runtime`: runtime v0.2 platform workspace. Owns sandbox abstractions, tool registry/source discovery, MCP adapters, resource injection, prompt source compilation, task lifecycle, sub-agent spawning, tracing, budget, audit, auth, and approval infrastructure. Inventory checked against `origin/main` commit `de4a5cc`.
 
 ## Layer Boundaries
 
@@ -14,7 +14,7 @@ This inventory summarizes the three framework repositories that the skill pack s
 
 `llm-harness-core` is the framework boundary. It should be the default integration layer for agent products. Use `Agent` for lightweight stateful prototypes and `AgentHarness` for session-backed agents, events, hooks, skills, compaction, and branch/session operations.
 
-`llm-harness-runtime` is an application/runtime convenience layer. Use it when building coding-agent style products that want built-in tools, prompt assembly, context-file loading, retry, JSONL session storage, and auto-compaction. Do not assume every domain agent should depend on runtime if it needs a custom runtime shape.
+`llm-harness-runtime` is the platform/runtime layer. Use it when building products that need sandbox lifecycle, tool discovery/registry, MCP integration, resource injection, prompt source compilation, task lifecycle/checkpoints, sub-agent spawning, tracing, audit, budget control, auth, or human approval. Runtime composes around core; it does not replace `AgentHarness`.
 
 ## Provider Integration
 
@@ -50,6 +50,8 @@ let client = Arc::new(deepseek::client(api_key)) as Arc<dyn LlmClient>;
 
 Provider-agnostic code should use the universal `Provider::chat` / `Provider::chat_stream` path. Use provider-native paths only for provider-specific fields such as OpenAI `extra_body`, `reasoning_effort`, Anthropic `thinking`, cache hints, or structured output differences.
 
+The adapter now also exposes `ChatRequest::extended_thinking_budget(...)` as a canonical request field. It is consumed by Anthropic conversion, ignored by providers that do not support it, and overridden by native `AnthropicExt::thinking(...)` when both are present.
+
 ## Core Contracts
 
 Important crates in `llm-harness-core`:
@@ -71,11 +73,13 @@ Use `AgentHarness` when:
 - The agent is product-facing or long-running.
 - It needs session persistence, JSONL/session repos, compaction, skills/templates, event observability, hooks, branch/session operations, or externally visible lifecycle state.
 
-Use `CodingAgentBuilder` from runtime when:
+Use runtime v0.2 when:
 
-- The product is close to a coding agent.
-- It should use built-in read/bash/edit/write/grep/find/ls tools.
-- It should assemble a coding-agent system prompt, load AGENTS.md/CLAUDE.md context files, load skills/templates, persist sessions, retry transient errors, and auto-compact.
+- The product needs sandboxed or lifecycle-managed execution environments.
+- Tools must be discovered, registered, filtered, or adapted from MCP/local sources.
+- External resources or prompt sources must be injected or compiled into core prompt resources.
+- Work should be tracked as tasks with checkpoints, retries, verification, and task-level state.
+- Sub-agents, tracing, audit, cost aggregation, budget control, auth, or human approval are needed.
 
 ## Tool Contract
 
@@ -98,7 +102,7 @@ Tools should use `ToolContext.env` for filesystem/shell operations, not direct l
 
 `ExecutionEnv` abstracts filesystem and shell access. Implementations may represent local OS, containers, remote machines, WASM sandboxes, or test mocks.
 
-Use `UnsupportedEnv` for agents without tool environment access. Use runtime `OsEnv` for local coding-agent workflows.
+Use `UnsupportedEnv` for agents without tool environment access. Use runtime sandbox implementation crates such as `llm-harness-runtime-sandbox-os`, `llm-harness-runtime-sandbox-bwrap`, or `llm-harness-runtime-sandbox-seatbelt` when runtime-managed environment boundaries are required.
 
 ## Hooks
 
@@ -124,15 +128,16 @@ UI and streaming integrations should subscribe before prompting and consume even
 
 ## Runtime Layer
 
-`llm-harness-runtime` currently exposes:
+`llm-harness-runtime` v0.2 currently exposes a platform workspace:
 
-- `CodingAgent` and `CodingAgentBuilder`
-- built-in tools: `read`, `bash`, `edit`, `write`, `grep`, `find`, `ls`
-- default active tools: `read`, `bash`, `edit`, `write`
-- settings merge: global settings plus project `.coding-agent/settings.json`
-- system prompt assembly with tools, context files, skills, custom prompt, appended prompt, and guidelines
-- session persistence through `JsonlSessionRepo`
-- auto-compaction after prompts
+- `llm-harness-runtime`: platform traits and adapters including `Sandbox`, `ToolRegistry`, `ToolSource`, `ResourceProvider`, `PromptSource`, `TaskRunner`, `SubAgentSpawner`, `TraceExporter`, `AuditSink`, `AuthHook`, `HumanApprovalWrapper`, `BudgetControlAdapter`, composite hooks, and tracing adapters.
+- `llm-harness-runtime-sandbox-os`: local development sandbox and execution environment.
+- `llm-harness-runtime-sandbox-bwrap`: Linux bubblewrap sandbox.
+- `llm-harness-runtime-sandbox-seatbelt`: macOS seatbelt sandbox.
+- `llm-harness-runtime-auth`: env/file auth hooks.
+- `llm-harness-runtime-mcp`: MCP adapter through runtime tool/prompt traits.
+- `llm-harness-runtime-audit-jsonl`: JSONL audit sink.
+- `llm-harness-runtime-trace-otel`: tracing exporters.
 
 ## High-Value Skill Coverage
 
@@ -142,6 +147,6 @@ The skill pack should help agents with:
 - Refactoring hardcoded Anthropic/OpenAI code into provider factories.
 - Authoring correct `Tool` implementations.
 - Wiring `AgentHarnessOptions`, `HarnessHooks`, and event loops.
-- Choosing `Agent`, `AgentHarness`, or runtime `CodingAgentBuilder`.
+- Choosing `Agent`, `AgentHarness`, or runtime v0.2 platform services.
 - Testing with mock clients and offline provider fixtures.
 - Avoiding architecture drift across adapter/core/runtime boundaries.

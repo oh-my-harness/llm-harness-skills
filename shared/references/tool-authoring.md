@@ -63,6 +63,27 @@ Use updates for progress that should be observed by UI but does not need to be f
 
 Default mode is `Parallel`. Use `Sequential` when the tool must form a boundary in a batch, such as stateful edits, unsafe operations, or operations that should not overlap with other tools.
 
+## Runtime Tool Registry
+
+In runtime v0.2, tool management is split across two planes:
+
+- `ToolRegistry`: management plane for registration, discovery, metadata, and coarse subsets.
+- `AgentHarness::set_tools` / `set_active_tools`: runtime plane for per-session and per-turn tool availability.
+
+Use `ToolRegistry` when a product needs to discover tools from MCP, local registries, or other `ToolSource` implementations before constructing or updating an agent. Use `active_tools` for dynamic turn-level gating.
+
+Do not confuse `ToolRegistry` with the core `Tool` trait. The registry manages a collection of tools; the core loop still executes `Arc<dyn Tool>`.
+
+Typical flow:
+
+```text
+ToolSource::discover()
+  -> ToolRegistry::register(...)
+  -> ToolRegistry::subset(...)
+  -> AgentHarness::set_tools(...)
+  -> AgentHarness::set_active_tools(...)
+```
+
 ## Error Classification
 
 Use `ToolError::InvalidArguments` for malformed or missing arguments.

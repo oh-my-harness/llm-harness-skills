@@ -64,8 +64,8 @@ The Codex skill should trigger when a task involves any of these:
 
 - `llm_adapter`, `llm-api-adapter`, provider integration, OpenAI-compatible endpoints, DeepSeek, Anthropic, OpenAI providers.
 - `llm_harness_core`, `llm-harness-core`, `Agent`, `AgentHarness`, `agent_loop`, `HarnessHooks`, `AgentHarnessEvent`.
-- `llm_harness_runtime`, `CodingAgentBuilder`, built-in tools, runtime settings, sessions, compaction, auth, budget, audit, or sandboxing.
-- Adding an agent tool, hook, provider factory, streaming UI, session-backed agent, or coding-agent runtime integration.
+- `llm_harness_runtime` v0.2 platform services: sandboxing, tool registry/source discovery, MCP, resources, prompt sources, task lifecycle, sub-agents, tracing, audit, auth, budget, approval, sessions, or compaction.
+- Adding an agent tool, hook, provider factory, streaming UI, session-backed agent, or runtime platform integration.
 
 ## SKILL.md Responsibilities
 
@@ -95,7 +95,7 @@ Use these reference files:
 - Do not bypass `llm_adapter` by hand-writing provider HTTP clients unless the task is explicitly to add a provider to the adapter crate.
 - Do not put provider-specific logic in tools.
 - Do not put tool execution logic in provider adapters.
-- Do not use runtime `CodingAgentBuilder` when a product needs a custom domain runtime unless the coding-agent shape is intentional.
+- Do not treat runtime v0.2 as a monolithic product-agent builder. Use only the platform services the product needs.
 - Do not hardcode one provider in business flows when a provider factory is feasible.
 - Do not read environment variables at every call site; centralize configuration.
 - Do not ignore stream termination events. Consumers should wait for `Settled`, `Aborted`, `AgentEnd`, or idle state depending on the layer.

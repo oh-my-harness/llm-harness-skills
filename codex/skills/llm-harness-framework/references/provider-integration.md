@@ -75,6 +75,23 @@ Use native provider paths only when the product needs provider-specific knobs:
 
 Native paths require concrete provider types and are not object-safe through `Arc<dyn LlmClient>`.
 
+## Extended Thinking
+
+The current adapter exposes a provider-agnostic `ChatRequest::extended_thinking_budget(...)` builder field:
+
+```rust
+let req = ChatRequest::builder(model, max_tokens)
+    .message(Message::User(vec![RequestContent::Text(prompt.into())]))
+    .extended_thinking_budget(2_000)
+    .build();
+```
+
+This canonical field is supported by Anthropic conversion and ignored by providers that do not support it. Anthropic native `AnthropicExt::thinking(...)` still exists and overrides the canonical request budget when both are present.
+
+Use the canonical field when generic harness/runtime code wants to request thinking without depending on Anthropic native types. Use native `AnthropicExt` only when other Anthropic-specific fields are also needed.
+
+DeepSeek reasoning is exposed through parsed `reasoning_content`; do not use `extended_thinking_budget` as a DeepSeek thinking control. Use OpenAI-compatible native `extra_body` only for DeepSeek-specific controls such as disabling thinking for tool-choice edge cases.
+
 ## Provider Factory Pattern
 
 When a product supports multiple providers, centralize provider construction.
@@ -119,3 +136,5 @@ Do not hardcode `AnthropicProvider` in chat, planning, solving, and synthesis pa
 Do not mix provider-specific model defaults into business logic. Keep them in config.
 
 Do not use native paths in generic runtime-switching code unless the selected provider is known and concrete.
+
+Do not assume `extended_thinking_budget` affects every provider. Guard product expectations with provider capability checks and provider-specific documentation.

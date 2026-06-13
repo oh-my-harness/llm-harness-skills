@@ -64,6 +64,10 @@ Use `before_tool_call`, `after_tool_call`, and turn hooks for tool audit.
 
 Do not sprinkle audit writes across provider calls and tools when a hook can centralize it.
 
+In runtime v0.2, `BudgetControlAdapter` is the standard bridge from cost policy to core hooks. It implements provider-response accounting and stop decisions through core hook traits. It should be registered alongside `after_provider_response` and `should_stop` rather than handled in business call sites.
+
+`AuditSink` and implementations such as JSONL audit belong to runtime. Use audit sinks for decision and state-transition records; keep large replay/debug payloads in tracing or tool details when appropriate.
+
 ## Context Transforms
 
 Use `TransformContextHook` for systematic context changes before LLM calls. This is the right place for compaction-style transforms, redaction, injected memory, or filtering.
@@ -76,11 +80,27 @@ Avoid mutating session storage directly as a substitute for context transforms.
 
 If using provider switching, make sure auth provider names and env var conventions match the selected provider.
 
+Runtime v0.2 reuses core `AuthHook` instead of defining a parallel auth trait. The `llm-harness-runtime-auth` crate provides `EnvAuthHook` and `FileAuthHook`.
+
 ## Hook Composition
 
-When multiple before-tool policies apply, compose hooks instead of overwriting one another. Runtime/core may provide helpers such as composite hook implementations.
+When multiple before-tool policies apply, compose hooks instead of overwriting one another. Runtime v0.2 provides composite hook helpers such as `CompositeBeforeToolCallHook`, `CompositeAfterToolCallHook`, `CompositeAfterTurnHook`, `CompositeBeforeProviderRequestHook`, and `CompositeAfterProviderResponseHook`.
 
 Order matters. Put hard-deny safety policies before softer rewriting policies when denial should win.
+
+When tracing and budget both observe provider responses, register tracing first and budget second so spans are captured even when budget control stops later turns.
+
+## Runtime Platform Hooks
+
+Runtime v0.2 uses core hooks to attach platform services:
+
+- `HumanApprovalWrapper`: implements `BeforeToolCallHook`.
+- `BudgetControlAdapter`: uses provider response accounting and stop decisions.
+- `TracingHookAdapter`: maps provider, tool, and turn events to `TraceExporter` spans.
+- `ResourceInjector`: injects `ResourceProvider` content through context transformation patterns.
+- `PromptTemplateCompiler`: compiles runtime `PromptSourceTemplate` into core `PromptTemplate` instead of introducing a second prompt engine.
+
+Do not create parallel hook systems in runtime or product crates when a core hook expresses the same lifecycle point.
 
 ## Common Mistakes
 

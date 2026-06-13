@@ -85,7 +85,7 @@ Do not stop after the first text delta or first message update.
 
 Use `AgentHarness::new_in_memory` for one-shot tests and prototypes.
 
-Use `AgentHarness::with_session` with a `Session` for persistent agents. Runtime `CodingAgentBuilder` can wire `JsonlSessionRepo` automatically when a `session_dir` is supplied.
+Use `AgentHarness::with_session` with a `Session` for persistent agents. Product agents or runtime task orchestration should wire the appropriate session repository explicitly.
 
 ## Compaction
 
@@ -99,7 +99,7 @@ Do not implement ad hoc transcript truncation in product code unless intentional
 
 Use harness skill/template loading when prompt resources should be first-class framework resources.
 
-Runtime `CodingAgentBuilder` can load skill dirs and template dirs during construction, then call `harness.reload_resources(...)`.
+Runtime prompt/source services can discover prompt templates and compile runtime `PromptSourceTemplate` values into core `PromptTemplate` values. Product agents can still call `harness.reload_resources(...)` for skill and template directories when using core resources directly.
 
 ## Runtime Mutations
 

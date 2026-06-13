@@ -1,6 +1,6 @@
 ---
 name: llm-harness-framework
-description: "Use when Codex is working with the llm-harness framework family: llm_adapter / llm-api-adapter provider integrations, DeepSeek/OpenAI/Anthropic provider switching, llm_harness_core Agent or AgentHarness code, llm_harness_runtime CodingAgentBuilder/runtime tools/settings, custom Tool implementations, HarnessHooks, agent event streaming, sessions, compaction, or tests for these Rust crates."
+description: "Use when Codex is working with the llm-harness framework family: llm_adapter / llm-api-adapter provider integrations, DeepSeek/OpenAI/Anthropic provider switching, llm_harness_core Agent or AgentHarness code, llm_harness_runtime v0.2 platform services, custom Tool implementations, ToolRegistry/ToolSource, Sandbox, MCP, ResourceProvider, PromptSource, TaskRunner, SubAgentSpawner, TraceExporter, AuditSink, AuthHook, BudgetControlAdapter, HumanApprovalWrapper, HarnessHooks, agent event streaming, sessions, compaction, or tests for these Rust crates."
 ---
 
 # LLM Harness Framework
@@ -17,7 +17,7 @@ Use this skill to make framework-aligned changes in projects built on `llm-api-a
 
 ## Reference Routing
 
-Read `references/architecture.md` when deciding where a change belongs, or whether to use `Agent`, `AgentHarness`, or runtime `CodingAgentBuilder`.
+Read `references/architecture.md` when deciding where a change belongs, or whether to use `Agent`, `AgentHarness`, or runtime v0.2 platform services.
 
 Read `references/provider-integration.md` for `llm_adapter`, `LlmClient`, DeepSeek, OpenAI-compatible endpoints, provider factories, or provider switching.
 
@@ -25,7 +25,7 @@ Read `references/agent-harness-patterns.md` for `AgentHarnessOptions`, sessions,
 
 Read `references/tool-authoring.md` when adding or modifying tools that implement `llm_harness_types::Tool`.
 
-Read `references/runtime-hooks.md` for `HarnessHooks`, auth, approval, budget, audit, replan, phase control, provider response hooks, or compaction hooks.
+Read `references/runtime-hooks.md` for `HarnessHooks`, auth, approval, budget, audit, tracing, replan, phase control, provider response hooks, compaction hooks, or runtime hook adapters.
 
 Read `references/testing-patterns.md` when adding or fixing tests around providers, loops, tools, hooks, runtime builders, or real API integration tests.
 
