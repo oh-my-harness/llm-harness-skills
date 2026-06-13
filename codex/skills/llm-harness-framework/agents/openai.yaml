@@ -1,0 +1,6 @@
+﻿interface:
+  display_name: "LLM Harness Framework"
+  short_description: "Use the llm-harness agent framework correctly."
+  default_prompt: "Use $llm-harness-framework to implement or refactor an llm-harness agent feature."
+policy:
+  allow_implicit_invocation: true
