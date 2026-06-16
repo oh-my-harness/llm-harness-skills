@@ -45,6 +45,8 @@ Respect `ctx.abort` for cancellable operations. Pass it through to `ExecutionEnv
 
 Avoid direct `std::fs` or shell process calls in tools unless the tool is intentionally local-only and the tradeoff is explicit.
 
+In `llm-harness-runtime-sandbox-os`, `execute_shell` uses `cmd.exe /C` on Windows and `sh -c` on Unix-like systems. Keep command strings and tests platform-aware when shell syntax differs.
+
 ## ToolResult
 
 `ToolResult.content` is sent back to the LLM.

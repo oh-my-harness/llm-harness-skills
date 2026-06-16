@@ -70,6 +70,8 @@ Use temp directories for sandbox work dirs, audit logs, auth files, checkpoints,
 
 Use in-memory exporters and fake providers for deterministic runtime tests. Do not make runtime unit tests depend on a real MCP server, OTel collector, or provider API unless the test is explicitly an opt-in integration test.
 
+For `TaskRunnerImpl`, cover both modes: the no-client stub path for state transitions and the `with_harness(client, model)` path with `MockLlmClient` for end-to-end task execution. When testing hook wiring, pass cloned `HarnessHooks` through `with_hooks(...)` and assert observable effects such as exported tracing spans.
+
 ## Real API Tests
 
 Gate real API tests behind environment variables:

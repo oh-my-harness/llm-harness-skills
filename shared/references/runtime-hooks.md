@@ -90,6 +90,8 @@ Order matters. Put hard-deny safety policies before softer rewriting policies wh
 
 When tracing and budget both observe provider responses, register tracing first and budget second so spans are captured even when budget control stops later turns.
 
+`HarnessHooks` is cloneable. Runtime task orchestration can build hook sets once and pass them into `TaskRunnerImpl::with_hooks(...)`, which wires them into the `AgentHarness` created by `TaskRunnerImpl::start()` when `with_harness(client, model)` has also been configured.
+
 ## Runtime Platform Hooks
 
 Runtime v0.2 uses core hooks to attach platform services:

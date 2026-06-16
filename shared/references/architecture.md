@@ -43,7 +43,7 @@ Use `Agent` when the task is a lightweight stateful prototype, test, or script. 
 
 Use `AgentHarness` when the task needs session persistence, compaction, skills/templates, branch/session operations, harness lifecycle events, hooks, or product-facing observability.
 
-Use runtime v0.2 when the product needs platform services around core: sandbox lifecycle, tool discovery/registry, MCP integration, resource injection, prompt source compilation, task lifecycle/checkpoints, sub-agent spawning, tracing, audit, budget control, auth, or human approval. Runtime does not replace `AgentHarness`; it composes around it through core hooks and platform traits.
+Use runtime v0.2 when the product needs platform services around core: sandbox lifecycle, tool discovery/registry, MCP integration, resource injection, prompt source compilation, task lifecycle/checkpoints, sub-agent spawning, tracing, audit, budget control, auth, or human approval. Runtime does not replace `AgentHarness`; it composes around it through core hooks and platform traits. When task orchestration should directly drive the harness, use `TaskRunnerImpl::with_harness(client, model)` and optionally `with_hooks(...)`.
 
 Use `llm-harness-loop` directly only when building a framework/runtime layer or testing loop behavior.
 

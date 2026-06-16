@@ -6,9 +6,9 @@ This repository keeps shared framework knowledge separate from agent-specific ex
 
 ## Covered Frameworks
 
-- `llm-api-adapter`: provider adapter layer for OpenAI, Anthropic, DeepSeek, and OpenAI-compatible endpoints.
-- `llm-harness-core`: core agent framework with messages, tools, execution envs, hooks, events, `Agent`, `AgentHarness`, sessions, compaction, and skills/templates.
-- `llm-harness-runtime`: runtime v0.2 platform workspace with sandbox, tool registry/source discovery, MCP adapters, resource injection, prompt sources, task lifecycle, sub-agents, tracing, audit, auth, budget, and human approval infrastructure.
+- `llm-api-adapter` ([GitHub](https://github.com/oh-my-harness/llm-api-adapter)): provider adapter layer for OpenAI, Anthropic, DeepSeek, and OpenAI-compatible endpoints.
+- `llm-harness-core` ([GitHub](https://github.com/oh-my-harness/llm-harness-core)): core agent framework with messages, tools, execution envs, hooks, events, `Agent`, `AgentHarness`, sessions, compaction, and skills/templates.
+- `llm-harness-runtime` ([GitHub](https://github.com/oh-my-harness/llm-harness-runtime)): runtime v0.2 platform workspace with sandbox, tool registry/source discovery, MCP adapters, resource injection, prompt sources, task lifecycle, sub-agents, tracing, audit, auth, budget, and human approval infrastructure.
 
 ## Repository Layout
 

@@ -4,9 +4,9 @@ This inventory summarizes the three framework repositories that the skill pack s
 
 ## Repositories
 
-- `D:\GKXTwork\llm-api-adapter`: provider adapter layer. Normalizes provider wire formats into canonical chat, streaming, tool-call, reasoning, usage, and error types. Inventory checked against `origin/main` commit `c1d2cb8`.
-- `D:\GKXTwork\llm-harness-core`: core agent framework. Owns message/tool/env contracts, streaming loop, `Agent`, `AgentHarness`, sessions, compaction, skills, and events. Inventory checked against `origin/main` commit `9ad7292`.
-- `D:\GKXTwork\llm-harness-runtime`: runtime v0.2 platform workspace. Owns sandbox abstractions, tool registry/source discovery, MCP adapters, resource injection, prompt source compilation, task lifecycle, sub-agent spawning, tracing, budget, audit, auth, and approval infrastructure. Inventory checked against `origin/main` commit `de4a5cc`.
+- `D:\GKXTwork\llm-api-adapter` / https://github.com/oh-my-harness/llm-api-adapter: provider adapter layer. Normalizes provider wire formats into canonical chat, streaming, tool-call, reasoning, usage, and error types. Inventory checked against GitHub `main` commit `c1d2cb8`.
+- `D:\GKXTwork\llm-harness-core` / https://github.com/oh-my-harness/llm-harness-core: core agent framework. Owns message/tool/env contracts, streaming loop, `Agent`, `AgentHarness`, sessions, compaction, skills, and events. Inventory checked against GitHub `main` commit `8ec31bb`.
+- `D:\GKXTwork\llm-harness-runtime` / https://github.com/oh-my-harness/llm-harness-runtime: runtime v0.2 platform workspace. Owns sandbox abstractions, tool registry/source discovery, MCP adapters, resource injection, prompt source compilation, task lifecycle, sub-agent spawning, tracing, budget, audit, auth, and approval infrastructure. Inventory checked against GitHub `main` commit `4382efe`.
 
 ## Layer Boundaries
 
@@ -78,7 +78,7 @@ Use runtime v0.2 when:
 - The product needs sandboxed or lifecycle-managed execution environments.
 - Tools must be discovered, registered, filtered, or adapted from MCP/local sources.
 - External resources or prompt sources must be injected or compiled into core prompt resources.
-- Work should be tracked as tasks with checkpoints, retries, verification, and task-level state.
+- Work should be tracked as tasks with checkpoints, retries, verification, task-level state, and optionally a real `AgentHarness` run through `TaskRunnerImpl::with_harness`.
 - Sub-agents, tracing, audit, cost aggregation, budget control, auth, or human approval are needed.
 
 ## Tool Contract
@@ -97,6 +97,8 @@ fn execute<'a>(&'a self, args: serde_json::Value, ctx: &'a ToolContext) -> BoxFu
 `ToolResult.content` is sent back to the LLM. `ToolResult.details` is structured side-channel data for UI, audit, or diagnostics. `ToolResult.terminate` allows early loop termination when all tools in a batch request termination.
 
 Tools should use `ToolContext.env` for filesystem/shell operations, not direct local IO, when portability or sandboxing matters.
+
+For `llm-harness-runtime-sandbox-os`, `execute_shell` uses the platform shell: `cmd.exe /C` on Windows and `sh -c` on Unix-like systems. Tests or tools that assert shell syntax should account for that platform split.
 
 ## Execution Environment
 
@@ -138,6 +140,8 @@ UI and streaming integrations should subscribe before prompting and consume even
 - `llm-harness-runtime-mcp`: MCP adapter through runtime tool/prompt traits.
 - `llm-harness-runtime-audit-jsonl`: JSONL audit sink.
 - `llm-harness-runtime-trace-otel`: tracing exporters.
+
+`TaskRunnerImpl::start()` has two modes. Without an injected client it remains a lightweight state transition path for unit tests. With `with_harness(client, model)` it creates an in-memory `AgentHarness`, wires cloned `HarnessHooks` via `with_hooks(...)`, runs the prompt, consumes harness events until settled or aborted, and records succeeded task state with turns, cost, and final text when present.
 
 ## High-Value Skill Coverage
 
