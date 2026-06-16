@@ -2,6 +2,16 @@
 
 Use this reference when deciding where a change belongs in the LLM Harness framework family.
 
+## Upstream Sources
+
+The upstream repositories are:
+
+- `llm-api-adapter`: https://github.com/oh-my-harness/llm-api-adapter
+- `llm-harness-core`: https://github.com/oh-my-harness/llm-harness-core
+- `llm-harness-runtime`: https://github.com/oh-my-harness/llm-harness-runtime
+
+When an API, behavior, or version detail is unclear, check the relevant upstream repository before making assumptions. If the framework has a bug, missing capability, or design gap, open an issue in the relevant upstream repository with the reproduction, expected behavior, and suggested direction. For features worth adding to the framework, prefer an upstream issue over burying the need in product-specific workaround code.
+
 ## Layers
 
 `llm-api-adapter` is the provider adapter layer. It normalizes OpenAI Chat Completions, Anthropic Messages, DeepSeek, and OpenAI-compatible endpoints into canonical request, response, stream, tool-call, reasoning, usage, and error types.

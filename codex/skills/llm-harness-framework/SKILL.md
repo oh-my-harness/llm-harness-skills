@@ -11,9 +11,18 @@ Use this skill to make framework-aligned changes in projects built on `llm-api-a
 
 1. Inspect the target repository before editing. Identify whether the task touches adapter, core, runtime, or product-agent code.
 2. Load only the reference files needed for the task.
-3. Preserve layer boundaries. Prefer existing framework traits, builders, hooks, and event types over ad hoc implementations.
-4. Keep provider construction, tool behavior, hook policy, and product workflow separated.
-5. Verify with focused Rust tests or examples before broad workspace tests.
+3. When an API, behavior, or version detail is unclear, check the relevant upstream repository instead of guessing.
+4. Preserve layer boundaries. Prefer existing framework traits, builders, hooks, and event types over ad hoc implementations.
+5. Keep provider construction, tool behavior, hook policy, and product workflow separated.
+6. Verify with focused Rust tests or examples before broad workspace tests.
+
+## Upstream Repositories
+
+- `llm-api-adapter`: https://github.com/oh-my-harness/llm-api-adapter
+- `llm-harness-core`: https://github.com/oh-my-harness/llm-harness-core
+- `llm-harness-runtime`: https://github.com/oh-my-harness/llm-harness-runtime
+
+Use the upstream repositories as the source of truth when skill references are incomplete, stale, or ambiguous. If framework behavior appears buggy or missing, open an issue in the relevant upstream repository with reproduction details. If a capability, abstraction, or API would be valuable to add to the framework, open an upstream issue describing the use case and proposed shape instead of only working around it in product code.
 
 ## Reference Routing
 
